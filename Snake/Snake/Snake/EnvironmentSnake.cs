@@ -370,6 +370,14 @@ namespace SnakeProjectGame
             Color(0);
         }
 
+        public static void Cheats(StringBuilder cheat)
+        {
+            Console.SetCursorPosition(10, 27);
+            Console.Write("                                                          ");
+            Console.SetCursorPosition(10, 27);
+            Console.Write(cheat);
+        }
+
         //Cheats
         public static void Cheats(bool f)
         {

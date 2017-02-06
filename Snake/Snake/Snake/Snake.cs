@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define Teting
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,9 @@ namespace SnakeProjectGame
         static ConsoleKeyInfo k;
         static ConsoleKeyInfo kOld;
         BodyParts old;
+        StringBuilder sb;
+
+        //StringBuilder sb;
         Thread thread;
 
         Type sn = typeof(Snake);
@@ -110,57 +114,58 @@ namespace SnakeProjectGame
             do
                 k = Console.ReadKey(true);
              while (DirectionOriginalMove());
-
             while (isAlive)  //Пока живой
             {
                 //Поток
                 thread = new Thread(ThreadChoice);
                 thread.Start();
 
-                //Направление движения
-                if (k.Key == ConsoleKey.UpArrow)
-                    CoordUp(ref k);
-                else if (k.Key == ConsoleKey.DownArrow)
-                    CoordDown(ref k);
-                else if (k.Key == ConsoleKey.LeftArrow)
-                    CoordLeft(ref k);
-                else if (k.Key == ConsoleKey.RightArrow)
-                    CoordRight(ref k);
+                while (thread.IsAlive && isAlive)
+                {
+                    //Направление движения
+                    if (k.Key == ConsoleKey.UpArrow)
+                        CoordUp(ref k);
+                    else if (k.Key == ConsoleKey.DownArrow)
+                        CoordDown(ref k);
+                    else if (k.Key == ConsoleKey.LeftArrow)
+                        CoordLeft(ref k);
+                    else if (k.Key == ConsoleKey.RightArrow)
+                        CoordRight(ref k);
 
-                //Проверка на нажатие рабочих клавиш
-                if (k.Key != ConsoleKey.UpArrow && k.Key != ConsoleKey.DownArrow
-                    && k.Key != ConsoleKey.LeftArrow && k.Key != ConsoleKey.RightArrow &&
-                    k.Key != ConsoleKey.P && k.Key != ConsoleKey.Q && k.Key != ConsoleKey.Tab)
-                    k = Console.ReadKey(true);
+                    //Проверка на нажатие рабочих клавиш
+                    if (k.Key != ConsoleKey.UpArrow && k.Key != ConsoleKey.DownArrow
+                        && k.Key != ConsoleKey.LeftArrow && k.Key != ConsoleKey.RightArrow &&
+                        k.Key != ConsoleKey.P && k.Key != ConsoleKey.Q && k.Key != ConsoleKey.Tab)
+                        k = Console.ReadKey(true);
 
-                //Выбор Паузы
+                    //Quit
+                    else if (k.Key == ConsoleKey.Q)
+                    {
+                        isAlive = false;
+                        return;
+                    }
+                }
+                 //Выбор Паузы
                 if (k.Key == ConsoleKey.P)
                 {
                     isPause = true;
-                    EnvironmentSnake.Pause(isPause);
+                    EnvironmentBase.Pause(isPause);
                     Pause();
                     k = kOld;
                     isPause = false;
-                    EnvironmentSnake.Pause(isPause);
+                    EnvironmentBase.Pause(isPause);
                     AllPartsOfBody();
                 }
+
                 if (k.Key == ConsoleKey.Tab)
                 {
                     TabEnter();
-                }
-                //Quit
-                else if (k.Key == ConsoleKey.Q)
-                {
-                    if (!thread.IsAlive)
-                        thread.Abort();
-                    isAlive = false;
                 }
             }
 
             //Прерывание для клавиши Q
             if (k.Key == ConsoleKey.Q)
             {
-                thread.Abort();    
                 return;
             }
             else
@@ -209,12 +214,12 @@ namespace SnakeProjectGame
                 k = kOld;
                 AllPartsOfBody();
                 if (isPause)
-                    EnvironmentSnake.Pause(true);
+                    EnvironmentBase.Pause(true);
             }
             else if (!chetsNewLife && !isAlive)
             {
                 AllPartsOfBody();
-                EnvironmentSnake.End();
+                EnvironmentBase.End();
                 k = new ConsoleKeyInfo();
             }
         }
@@ -236,6 +241,12 @@ namespace SnakeProjectGame
         //Поток
         static void ThreadChoice()
         {
+#if Teting
+            Console.SetCursorPosition(2, 2);
+            Console.Write("               ");
+            Console.SetCursorPosition(2, 2);
+            Console.Write("Thread.IsAlive");
+#endif
             do
             {
                 //Если нажаты действующие клавиши и не нажата Пауза
@@ -244,10 +255,18 @@ namespace SnakeProjectGame
                     kOld = k;
 
                 k = Console.ReadKey(true);
-            } while (((k.Key == ConsoleKey.UpArrow || k.Key == ConsoleKey.DownArrow) && (kOld.Key == ConsoleKey.UpArrow || kOld.Key == ConsoleKey.DownArrow)) || //ДуВайл при нажатии одинаковых или противоположных клавиш по вертикали
-            ((k.Key == ConsoleKey.RightArrow || k.Key == ConsoleKey.LeftArrow) && (kOld.Key == ConsoleKey.RightArrow || kOld.Key == ConsoleKey.LeftArrow)) ||    //ДуВайл при нажатии одинаковых или противоположных клавиш по горизонтали
-            ((k.Key != ConsoleKey.UpArrow && k.Key != ConsoleKey.DownArrow && k.Key != ConsoleKey.LeftArrow && k.Key != ConsoleKey.RightArrow))                  //ДуВайл при нажатии не рабочих клавиш и живой змейке
-            && isAlive && k.Key != ConsoleKey.Tab && !isPause); //ДуВайл при Паузе
+            } while (isAlive && k.Key != ConsoleKey.Tab && k.Key != ConsoleKey.Q && k.Key != ConsoleKey.P); //ДуВайл при Паузе
+#if Teting
+            Console.SetCursorPosition(2, 2);
+            Console.Write("                ");
+            Console.SetCursorPosition(2, 2);
+            Console.Write("Thread.NotAlive");
+#endif
+            //((k.Key == ConsoleKey.UpArrow || k.Key == ConsoleKey.DownArrow) && (kOld.Key == ConsoleKey.UpArrow || kOld.Key == ConsoleKey.DownArrow)) || //ДуВайл при нажатии одинаковых или противоположных клавиш по вертикали
+            //((k.Key == ConsoleKey.RightArrow || k.Key == ConsoleKey.LeftArrow) && (kOld.Key == ConsoleKey.RightArrow || kOld.Key == ConsoleKey.LeftArrow)) ||    //ДуВайл при нажатии одинаковых или противоположных клавиш по горизонтали
+            //((k.Key != ConsoleKey.UpArrow && k.Key != ConsoleKey.DownArrow && k.Key != ConsoleKey.LeftArrow && k.Key != ConsoleKey.RightArrow))                  //ДуВайл при нажатии не рабочих клавиш и живой змейке
+            //&&
+
         }
         #endregion
 
@@ -350,7 +369,7 @@ namespace SnakeProjectGame
             {
                 //Score
                 Console.SetCursorPosition(7, 30);
-                EnvironmentSnake.Color(2);  Console.Write("{0}", ++Food.Score); EnvironmentSnake.Color(0);
+                EnvironmentBase.Color(2);  Console.Write("{0}", ++Food.Score); EnvironmentBase.Color(0);
 
                 //Добавление размеров змеи м координатами съеденой еды
                 snakeBody.Add(new BodyParts(food.X, food.Y));
@@ -379,7 +398,7 @@ namespace SnakeProjectGame
                 if (snakeBody[snakeBody.Count - 1].X == snakeBody[i].X && snakeBody[snakeBody.Count - 1].Y == snakeBody[i].Y || isAlive == false)
                 {
                     //Окружение конца
-                    EnvironmentSnake.End();
+                    EnvironmentBase.End();
                     isAlive = false;
                     return true;
                 }
@@ -408,34 +427,50 @@ namespace SnakeProjectGame
 
         byte Cheats()
         {
-            EnvironmentSnake.Cheats(true);
-            if(!thread.IsAlive)
-                k = Console.ReadKey();
+            EnvironmentBase.Cheats(true);
+
+            sb = new StringBuilder();
+            while ((k = Console.ReadKey(true)).Key != ConsoleKey.Q && k.Key != ConsoleKey.Tab && k.Key != ConsoleKey.Enter)
+            {
+                if (k.Key == ConsoleKey.Backspace && sb.Length > 0)
+                {
+                    sb.Remove(sb.Length - 1, 1);
+                    //foreach (char a in sb)
+                    //    Console.Write(a);
+                }
+                else if (k.Key != ConsoleKey.Backspace && sb.Length < 58)
+                {
+                    sb.Append(Convert.ToChar(k.KeyChar));
+                    //foreach (char a in sb)
+                    //    Console.Write(a);
+                }
+                EnvironmentBase.Cheats(sb);
+            }
+
             if (k.Key == ConsoleKey.Tab)
             {
-                EnvironmentSnake.Cheats(false);
+                EnvironmentBase.Cheats(false);
                 return 0;
             }
-            string d = Convert.ToString(k.KeyChar);
-            string a = Console.ReadLine();
-            d += a;
 
-            if (d == "new")
+            string cheat = Convert.ToString(sb);
+
+            if (cheat == "new")
             {
-                cheatList.Add(sn.FullName + "%" + st.FullName + "&" + d.GetHashCode() + "^" + d);
+                cheatList.Add(sn.FullName + "%" + st.FullName + "&" + cheat.GetHashCode() + "^" + cheat);
                 return 1;
             }
             else
                 try
                 {
-                    int sp = Convert.ToInt32(d);
+                    int sp = Convert.ToInt32(cheat);
                     speed = sp;
                     chetsSpeed = true;
-                    cheatList.Add(sn.FullName + "%" + it.FullName + "&" + d.GetHashCode() + "^" + d);
+                    cheatList.Add(sn.FullName + "%" + it.FullName + "&" + cheat.GetHashCode() + "^" + cheat);
                 }
                 catch(Exception e)
                 {
-                    cheatList.Add("Invalid input$" + e.Message + "^" + d);
+                    cheatList.Add("Invalid input$" + e.Message + "^");
                 }
             return 2;
         }
