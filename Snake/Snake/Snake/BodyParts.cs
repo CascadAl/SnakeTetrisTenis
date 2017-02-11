@@ -26,7 +26,7 @@ namespace SnakeProjectGame
             get { return x; }
             set
             {
-                if(value > 0 && value < EnvironmentSnake.width)
+                if(value > 0 && value < EnvironmentBase.width)
                     x = value;
                 else
                     Snake.isAlive = false;
@@ -37,7 +37,7 @@ namespace SnakeProjectGame
             get { return y; }
             set
             {
-                if (value > 0 && value < EnvironmentSnake.height)
+                if (value > 0 && value < EnvironmentBase.height)
                     y = value;
                 else
                     Snake.isAlive = false;

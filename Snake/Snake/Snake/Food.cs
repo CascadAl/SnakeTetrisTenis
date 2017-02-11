@@ -10,7 +10,7 @@ namespace SnakeProjectGame
     {
         int x, y;
         static int score;
-        byte[,] array = new byte[EnvironmentSnake.width, EnvironmentSnake.height];
+        byte[,] array = new byte[EnvironmentBase.width, EnvironmentBase.height];
         List<Food> f = new List<Food>();
 
         Random rand = new Random();
@@ -45,8 +45,8 @@ namespace SnakeProjectGame
 
         public Food()
         {
-            X = rand.Next(1, EnvironmentSnake.width);
-            Y = rand.Next(1, EnvironmentSnake.height);
+            X = rand.Next(1, EnvironmentBase.width);
+            Y = rand.Next(1, EnvironmentBase.height);
         }
         private Food(int u, int m)
         {
@@ -57,17 +57,16 @@ namespace SnakeProjectGame
 
         public void NewFood(List<BodyParts> body)
         {
-            //Score++;
             foreach (BodyParts b in body)
                 array[b.X, b.Y] = 1;
 
-            X = rand.Next(1, EnvironmentSnake.width);
-            Y = rand.Next(1, EnvironmentSnake.height);
+            X = rand.Next(1, EnvironmentBase.width);
+            Y = rand.Next(1, EnvironmentBase.height);
 
             if (array[X, Y] == 1)
             {
-                for (byte i = 1; i < EnvironmentSnake.width; i++)
-                    for (byte j = 1; j < EnvironmentSnake.height; j++)
+                for (byte i = 1; i < EnvironmentBase.width; i++)
+                    for (byte j = 1; j < EnvironmentBase.height; j++)
                         if (array[i, j] == 0)
                             f.Add(new Food(i, j));
 

@@ -131,7 +131,7 @@ namespace SnakeProjectGame
                         CoordLeft(ref k);
                     else if (k.Key == ConsoleKey.RightArrow)
                         CoordRight(ref k);
-
+                    
                     //Проверка на нажатие рабочих клавиш
                     if (k.Key != ConsoleKey.UpArrow && k.Key != ConsoleKey.DownArrow
                         && k.Key != ConsoleKey.LeftArrow && k.Key != ConsoleKey.RightArrow &&
@@ -435,14 +435,10 @@ namespace SnakeProjectGame
                 if (k.Key == ConsoleKey.Backspace && sb.Length > 0)
                 {
                     sb.Remove(sb.Length - 1, 1);
-                    //foreach (char a in sb)
-                    //    Console.Write(a);
                 }
                 else if (k.Key != ConsoleKey.Backspace && sb.Length < 58)
                 {
                     sb.Append(Convert.ToChar(k.KeyChar));
-                    //foreach (char a in sb)
-                    //    Console.Write(a);
                 }
                 EnvironmentBase.Cheats(sb);
             }

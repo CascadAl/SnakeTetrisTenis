@@ -15,16 +15,16 @@ namespace SnakeProjectGame
             EnvironmentBase env = new EnvironmentBase();
             while (true)
             {
-                a = EnvironmentBase.Begin(a);
-                if (a == 1)
-                { Snake snake = new Snake(); snake.FirstPlace(); }
-                else if (a == 2)
-                { Console.WriteLine("Tetris"); Thread.Sleep(5000); }
-                else if (a == 3)
-                { Console.WriteLine("Tenis"); Thread.Sleep(5000); }
-                else if (a == 0)
-                { return; }
-                a = 0;
+                //a = EnvironmentBase.Begin(a);
+                //if (a == 1)
+                //{ Snake snake = new Snake(); snake.FirstPlace(); }
+                //else if (a == 2)
+                { Tetris tetris = new Tetris(); tetris.MoveMethod(); }
+                //else if (a == 3)
+                //{ Console.WriteLine("Tenis"); Thread.Sleep(5000); }
+                //else if (a == 0)
+                //{ return; }
+                //a = 0;
             }
         }
     }

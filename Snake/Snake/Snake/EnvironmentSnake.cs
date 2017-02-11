@@ -327,28 +327,20 @@ namespace SnakeProjectGame
         //Цвет
         public static void Color(byte a)
         {
-            if (a == 1)
-                Console.ForegroundColor = ConsoleColor.Cyan;
-            else if (a == 2)
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-            else if (a == 3)
-                Console.ForegroundColor = ConsoleColor.Red;
-            else if (a == 4)
-                Console.ForegroundColor = ConsoleColor.Green;
-            else if (a == 5)
-                Console.ForegroundColor = ConsoleColor.Yellow;
-            else if (a == 6)
-                Console.ForegroundColor = ConsoleColor.Black;
-            else if (a == 7)
-                Console.ForegroundColor = ConsoleColor.Magenta;
-            else if (a == 8)
-                Console.ForegroundColor = ConsoleColor.White;
-            else if (a == 9)
-                Console.ForegroundColor = ConsoleColor.DarkGreen;
-            else if (a == 10)
-                Console.ForegroundColor = ConsoleColor.Blue;
-            else
-                Console.ForegroundColor = ConsoleColor.Gray;
+            switch (a)
+            {
+                case 1: Console.ForegroundColor = ConsoleColor.Cyan; break;
+                case 2: Console.ForegroundColor = ConsoleColor.DarkGray; break;
+                case 3: Console.ForegroundColor = ConsoleColor.Red; break;
+                case 4: Console.ForegroundColor = ConsoleColor.Green; break;
+                case 5: Console.ForegroundColor = ConsoleColor.Yellow; break;
+                case 6: Console.ForegroundColor = ConsoleColor.Black; break;
+                case 7: Console.ForegroundColor = ConsoleColor.Magenta; break;
+                case 8: Console.ForegroundColor = ConsoleColor.White; break;
+                case 9: Console.ForegroundColor = ConsoleColor.DarkGreen; break;
+                case 10: Console.ForegroundColor = ConsoleColor.Blue; break;
+                default: Console.ForegroundColor = ConsoleColor.Gray; break;
+            }
         }
 
         //Пауза
@@ -447,7 +439,7 @@ namespace SnakeProjectGame
         //Рамка
         public static void Frame()
         {
-            Color(0);
+            Color(2);
             for (byte j = 0; j < height + 1; j++)
             {
                 if (j == 0 || j == height)
@@ -467,4 +459,31 @@ namespace SnakeProjectGame
             Console.Write("        Q"); Color(2); Console.Write(" - Quit"); Color(0);
         }
     }
+
+    class EnvironmentTetris : EnvironmentBase
+    {
+        //Рамка
+        public static void Frame()
+        {
+            Color(2);
+            for(byte i = 0; i < height + 1; i++)
+                for (byte j = 0; j < width + 1; j++)
+                    if (i < height)
+                        if (j <= (width - 30) / 2 || j > (width + 30) / 2)
+                            Console.Write('#');
+                        else if(i == 0)
+                            Console.Write('_');
+                        else
+                            Console.Write(' ');
+                        else
+                            Console.Write('#');
+
+            Color(0);
+            //Console.SetCursorPosition(23, 30);
+            //Console.Write("Score:"); Color(2); Console.Write(" {0}", Food.Score); Color(1);
+            //Console.Write("     P"); Color(2); Console.Write(" - Pause"); Color(1);
+            //Console.Write("     Q"); Color(2); Console.Write(" - Quit"); Color(0);
+        }
+    }
+
 }
