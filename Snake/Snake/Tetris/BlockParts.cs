@@ -55,10 +55,10 @@ namespace SnakeProjectGame
             }
         }
 
-        public BlockParts(int a, int b)
+        public BlockParts(int xCoord, int yCoord)
         {
-            X = a;
-            Y = b;
+            X = xCoord;
+            Y = yCoord;
             body = '#';
         }
 

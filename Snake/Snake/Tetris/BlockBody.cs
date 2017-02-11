@@ -8,24 +8,27 @@ namespace SnakeProjectGame
 {
     class BlockBody
     {
+        public static byte BlockColor { get; set; }
         public enum EnumTetris : byte { T = 1, G, I, L, E }
         Random rand = new Random();
-        public EnumTetris NewBody(ref List<BlockParts> z)
+        public EnumTetris NewBody(ref List<BlockParts> blockBody)
         {
             EnumTetris entetr = (EnumTetris)(rand.Next(1, 6));
             switch (entetr)
             {
                 case EnumTetris.T:
-                    z = new List<BlockParts>()
+                    BlockColor = 7;
+                    blockBody = new List<BlockParts>()
                     {
                         new BlockParts(38, 2),
                         new BlockParts(39, 2),
                         new BlockParts(39, 1),
-                        new BlockParts(40, 2)
+                        new BlockParts(40, 2),
                     };
                     break;
                 case EnumTetris.L:
-                    z = new List<BlockParts>()
+                    BlockColor = 4;
+                    blockBody = new List<BlockParts>()
                     {
                         new BlockParts(38, 2),
                         new BlockParts(39, 2),
@@ -34,7 +37,8 @@ namespace SnakeProjectGame
                     };
                     break;
                 case EnumTetris.I:
-                    z = new List<BlockParts>()
+                    BlockColor = 5;
+                    blockBody = new List<BlockParts>()
                     {
                         new BlockParts(38, 1),
                         new BlockParts(39, 1),
@@ -43,7 +47,8 @@ namespace SnakeProjectGame
                     };
                     break;
                 case EnumTetris.E:
-                    z = new List<BlockParts>()
+                    BlockColor = 1;
+                    blockBody = new List<BlockParts>()
                     {
                         new BlockParts(39, 1),
                         new BlockParts(40, 2),
@@ -52,7 +57,8 @@ namespace SnakeProjectGame
                     };
                     break;
                 case EnumTetris.G:
-                    z = new List<BlockParts>()
+                    BlockColor = 11;
+                    blockBody = new List<BlockParts>()
                     {
                         new BlockParts(38, 2),
                         new BlockParts(39, 2),
@@ -64,25 +70,25 @@ namespace SnakeProjectGame
             return entetr;
         }
 
-        public static bool IsRightStop(List<BlockParts> bl)
+        public static bool IsRightStop(List<BlockParts> blockParts)
         {
-            bl[bl.Count - 1].X++;
-            if (bl[bl.Count - 1].isLeftRightStopBlock)
+            blockParts[blockParts.Count - 1].X++;
+            if (blockParts[blockParts.Count - 1].isLeftRightStopBlock)
                 return true;
-            bl[bl.Count - 1].X--;
-            foreach (BlockParts b in bl)
+            blockParts[blockParts.Count - 1].X--;
+            foreach (BlockParts b in blockParts)
                 b.X++;
 
             return false;
         }
 
-        public static bool IsLeftStop(List<BlockParts> bl)
+        public static bool IsLeftStop(List<BlockParts> blockParts)
         {
-            bl[0].X--;
-            if (bl[0].isLeftRightStopBlock)
+            blockParts[0].X--;
+            if (blockParts[0].isLeftRightStopBlock)
                 return true;
-            bl[0].X++;
-            foreach (BlockParts b in bl)
+            blockParts[0].X++;
+            foreach (BlockParts b in blockParts)
             {
                 //b.Y--;
                 b.X--;
@@ -91,27 +97,27 @@ namespace SnakeProjectGame
             return false;
         }
 
-        public static bool IsDownStop(List<BlockParts> bl)
+        public static bool IsDownStop(List<BlockParts> blockParts)
         {
-            bl[1].Y++;
-            if (bl[1].isStopBlock)
+            blockParts[1].Y++;
+            if (blockParts[1].isStopBlock)
                 return true;
-            bl[1].Y--;
+            blockParts[1].Y--;
             //foreach (BlockParts b in bl)
             //    b.Y++;
 
             return false;
         }
 
-        public static void MoveRecoil(List<BlockParts> bl, int a)
+        public static void MoveRecoil(List<BlockParts> blockParts, int leftRight)
         {
-            if (a >= 0)
-                foreach (BlockParts b in bl)
+            if (leftRight >= 0)
+                foreach (BlockParts b in blockParts)
                 {
                     b.X++;
                 }
-            else if (a < 0)
-                foreach (BlockParts b in bl)
+            else if (leftRight < 0)
+                foreach (BlockParts b in blockParts)
                 {
                     b.X--;
                 }

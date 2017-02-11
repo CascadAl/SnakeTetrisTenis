@@ -44,10 +44,10 @@ namespace SnakeProjectGame
             }
         }
 
-        public BodyParts(int a, int b) :this()
+        public BodyParts(int xCoord, int yCoord) :this()
         {
-            X = a;
-            Y = b;
+            X = xCoord;
+            Y = yCoord;
             body = '*';
         }
     }

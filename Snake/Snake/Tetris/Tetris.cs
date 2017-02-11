@@ -6,13 +6,16 @@ using System.Threading;
 
 namespace SnakeProjectGame
 {
+    delegate void Move(ref ConsoleKeyInfo key);
+
     class Tetris
     {
         static int[,] cheatCoord;
+        public static int Score { get; private set; }
+        static int Speed { get; set; }
 
-        delegate void Move(ref ConsoleKeyInfo key);
         Dictionary<ConsoleKey, Move> dict;
-        static byte[,] arrayAllOldBlocks;
+        static byte[,,] arrayAllOldBlocks;
         static BlockBody.EnumTetris enumTetris;
 
         static int[] arrBlocksLineClear;
@@ -34,28 +37,30 @@ namespace SnakeProjectGame
         {
             blockB = new BlockBody();
             EnvironmentTetris.Frame();
-            arrayAllOldBlocks = new byte[30, 28];
+            arrayAllOldBlocks = new byte[2, 30, 28];
 
             thread = new Thread(ThreadChoice);
             thread.Start();
             do
             {
                 enumTetris = blockB.NewBody(ref blockParts);
+                EnvironmentBase.Color(BlockBody.BlockColor);
                 count = 1;
                 isNew = false;
                 WriteBlock();
-                Thread.Sleep(200);
+                Thread.Sleep(Speed);
                 ClearBlock();
                 do
                 {
                     DefinDict(ref k);
                 } while (!isNew);
                 //thread.Join();
-            } while (blockParts[0].Y != 1);
+            } while (blockParts[0].Y > 2);
         }
 
         public Tetris()
         {
+            Speed = 200;
             cheatCoord = new int[2, 4];
 
             arrBlocksLineClear = new int[28];
@@ -81,7 +86,7 @@ namespace SnakeProjectGame
 
                 foreach (BlockParts a in blockParts)
                 {
-                    if (arrayAllOldBlocks[a.X - 25, a.Y] == 1)
+                    if (arrayAllOldBlocks[0, a.X - 25, a.Y] == 1)
                     {
                         lo = false;
                         break;
@@ -94,27 +99,37 @@ namespace SnakeProjectGame
             IsNew();
         }
 
+        static void ChangeScore(int plusScore, byte colorNumber)
+        {
+            Console.SetCursorPosition(12, 30);
+            EnvironmentBase.Color(colorNumber); Console.Write("{0}", Score += plusScore);
+        }
+
         static void IsNew()
         {
             WriteBlock();
+
             Array.Clear(cheatCoord, 0, 4);
             isNew = true;
             foreach (BlockParts a in blockParts)
             {
-                arrayAllOldBlocks[a.X - 25, a.Y - 1] = 1;
+                arrayAllOldBlocks[0, a.X - 25, a.Y - 1] = 1;
+                arrayAllOldBlocks[1, a.X - 25, a.Y - 1] = BlockBody.BlockColor;
+
                 arrBlocksLineClear[a.Y - 1]++;
             }
             foreach (BlockParts a in blockParts)
             {
                 if (arrBlocksLineClear[a.Y - 1] == 30)
                 {
-                    Thread.Sleep(200);
-                    ClearLine(a.Y); Thread.Sleep(200);
+                    Thread.Sleep(100);
+                    ClearLine(a.Y); Thread.Sleep(100);
                     ClearAllUpBlocks(a.Y - 1);
                     LineShiftDown(a.Y - 1);
-                    WriteAllUpBlocks(a.Y - 1); Thread.Sleep(200);
+                    WriteAllUpBlocks(a.Y - 1); Thread.Sleep(100);
                 }
             }
+            ChangeScore(1, 2);
         }
 
         //DownArrow
@@ -137,7 +152,7 @@ namespace SnakeProjectGame
                     Console.WriteLine(a.Body);
                 }
 
-                Thread.Sleep(300);
+                Thread.Sleep(Speed);
 
                 ClearBlock();
             } while (k.Key != ConsoleKey.LeftArrow && k.Key != ConsoleKey.RightArrow && k.Key != ConsoleKey.Enter && k.Key != ConsoleKey.Spacebar);
@@ -170,9 +185,9 @@ namespace SnakeProjectGame
             }
 
             if (counter == 1)
-                Thread.Sleep(200);
+                Thread.Sleep(Speed);
             else
-                Thread.Sleep(50);
+                Thread.Sleep(40);
 
             ClearBlock();
 
@@ -205,7 +220,7 @@ namespace SnakeProjectGame
             }
 
             if (counter == 1)
-                Thread.Sleep(200);
+                Thread.Sleep(Speed);
             else
                 Thread.Sleep(40);
 
@@ -333,7 +348,7 @@ namespace SnakeProjectGame
                         wh = false;
                         break;
                     }
-                    else if (arrayAllOldBlocks[bl.X - 25, bl.Y + count] != 0)
+                    else if (arrayAllOldBlocks[0, bl.X - 25, bl.Y + count] != 0)
                     {
                         wh = false;
                         break;
@@ -350,9 +365,9 @@ namespace SnakeProjectGame
                     cheatCoord[0, ind] = bl.X;
                     cheatCoord[1, ind++] = bl.Y + count;
                     Console.SetCursorPosition(bl.X, bl.Y + count);
-                    Console.Write(bl.Body);
+                    Console.Write('H');
                 }
-                EnvironmentBase.Color(0);
+                EnvironmentBase.Color(BlockBody.BlockColor);
             }
         }
 
@@ -360,7 +375,18 @@ namespace SnakeProjectGame
         static void ClearLine(int yCoord)
         {
             for (int i = 0; i < 30; i++)
-                arrayAllOldBlocks[i, yCoord - 1] = 0;
+                arrayAllOldBlocks[0, i, yCoord - 1] = 0;
+
+            ChangeScore(10, 7);
+
+            EnvironmentBase.Color(8);
+            Console.SetCursorPosition(25, yCoord);
+            Console.Write(new string('#', 30));
+            Speed -= 5;
+            Thread.Sleep(250);
+
+            ChangeScore(10, 2);
+
             Console.SetCursorPosition(25, yCoord);
             Console.Write(new string (' ', 30));
         }
@@ -370,10 +396,12 @@ namespace SnakeProjectGame
         {
             for(int i = 0; i < 30; i++)
                 for(int j = yCoord - 1; j > 0; j--)
-                    if(arrayAllOldBlocks[i, j] != 0)
+                    if(arrayAllOldBlocks[0, i, j] != 0)
                     {
-                        arrayAllOldBlocks[i, j + 1] = arrayAllOldBlocks[i, j];
-                        arrayAllOldBlocks[i, j] = 0;
+                        arrayAllOldBlocks[0, i, j + 1] = arrayAllOldBlocks[0, i, j];
+                        arrayAllOldBlocks[1, i, j + 1] = arrayAllOldBlocks[1, i, j];
+
+                        arrayAllOldBlocks[0, i, j] = 0;
                     }
             for (int i = yCoord; i > 0; i--)
                 arrBlocksLineClear[i] = arrBlocksLineClear[i - 1];
@@ -385,8 +413,9 @@ namespace SnakeProjectGame
         {
             for(int i = 0; i < 30; i++)
                 for (int j = 27; j > 0; j--)
-                    if (arrayAllOldBlocks[i, j] != 0)
+                    if (arrayAllOldBlocks[0, i, j] != 0)
                     {
+                        EnvironmentBase.Color(arrayAllOldBlocks[1, i, j]);
                         Console.SetCursorPosition(i + 25, j + 1);
                         Console.Write('#');
                     }
@@ -397,7 +426,7 @@ namespace SnakeProjectGame
         {
             for (int i = 0; i < 30; i++)
                 for (int j = yCoord - 1; j >= 0; j--)
-                    if (arrayAllOldBlocks[i, j] != 0)
+                    if (arrayAllOldBlocks[0, i, j] != 0)
                     {
                         Console.SetCursorPosition(i + 25, j + 1);
                         Console.Write(' ');
@@ -441,14 +470,14 @@ namespace SnakeProjectGame
                 return true;
 
             foreach (BlockParts a in blockParts)
-                if (arrayAllOldBlocks[a.X - 25, a.Y] == 1)
+                if (arrayAllOldBlocks[0, a.X - 25, a.Y] == 1)
                     return true;
             return false;
         }
         static bool IsStopLeftRightMoveBlock()
         {
             foreach (BlockParts a in blockParts)
-                if (arrayAllOldBlocks[a.X - 25, a.Y - 1] == 1)
+                if (arrayAllOldBlocks[0, a.X - 25, a.Y - 1] == 1)
                     return true;
             return false;
         }

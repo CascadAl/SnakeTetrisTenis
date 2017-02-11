@@ -339,6 +339,8 @@ namespace SnakeProjectGame
                 case 8: Console.ForegroundColor = ConsoleColor.White; break;
                 case 9: Console.ForegroundColor = ConsoleColor.DarkGreen; break;
                 case 10: Console.ForegroundColor = ConsoleColor.Blue; break;
+                case 11: Console.ForegroundColor = ConsoleColor.DarkYellow; break;
+
                 default: Console.ForegroundColor = ConsoleColor.Gray; break;
             }
         }
@@ -478,11 +480,13 @@ namespace SnakeProjectGame
                         else
                             Console.Write('#');
 
-            Color(0);
-            //Console.SetCursorPosition(23, 30);
-            //Console.Write("Score:"); Color(2); Console.Write(" {0}", Food.Score); Color(1);
-            //Console.Write("     P"); Color(2); Console.Write(" - Pause"); Color(1);
-            //Console.Write("     Q"); Color(2); Console.Write(" - Quit"); Color(0);
+            Color(1);
+            Console.SetCursorPosition(5, 30);
+            Console.Write("Score:"); Color(2); Console.Write(" {0}", Tetris.Score); Color(1);
+            Console.Write("     P"); Color(2); Console.Write(" - Pause"); Color(1);
+            Console.Write("     Space"); Color(2); Console.Write(" - Turn"); Color(1);
+            Console.Write("     Enter"); Color(2); Console.Write(" - Down"); Color(1);
+            Console.Write("     Q"); Color(2); Console.Write(" - Quit"); Color(0);
         }
     }
 
