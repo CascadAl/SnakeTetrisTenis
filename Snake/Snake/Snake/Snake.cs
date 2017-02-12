@@ -22,6 +22,9 @@ namespace SnakeProjectGame
         static ConsoleKeyInfo kOld;
         BodyParts old;
         StringBuilder sb;
+        byte snakeColor;
+        byte foodColor = 3;
+        Random rand = new Random();
 
         //StringBuilder sb;
         Thread thread;
@@ -32,10 +35,10 @@ namespace SnakeProjectGame
 
         Food food = new Food();
 
-        int speed = 75;
+        static int speed = 75;
 
         //Свойство скорости
-        public int Speed
+        public static int Speed
         {
             get { return speed; }
             set
@@ -50,6 +53,7 @@ namespace SnakeProjectGame
         //Обновить данные
         void Reset()
         {
+            snakeColor = 0;
             snakeBody = new List<BodyParts>
         {
             new BodyParts(15, 15),
@@ -62,9 +66,9 @@ namespace SnakeProjectGame
 
             if((int)EnvironmentBase.enModeBeg == 0)
                 Speed = (int)EnvironmentBase.enumModeBegin.Easy;
-            if ((int)EnvironmentBase.enModeBeg == 1)
+            else if ((int)EnvironmentBase.enModeBeg == 1)
                 Speed = (int)EnvironmentBase.enumModeBegin.Normal;
-            if ((int)EnvironmentBase.enModeBeg == 2)
+            else if ((int)EnvironmentBase.enModeBeg == 2)
                 Speed = (int)EnvironmentBase.enumModeBegin.Hard;
 
             Food.Score = 0;
@@ -85,7 +89,7 @@ namespace SnakeProjectGame
                 isAlive = true;
 
                 //Тело змеи и еда
-                AllPartsOfBody();
+                AllPartsOfBody(0, foodColor);
                 BeginNewFood();
                 do
                     Move();
@@ -148,13 +152,15 @@ namespace SnakeProjectGame
                  //Выбор Паузы
                 if (k.Key == ConsoleKey.P)
                 {
+                    AllPartsOfBody(0, 0);
+
                     isPause = true;
                     EnvironmentBase.Pause(isPause);
                     Pause();
                     k = kOld;
                     isPause = false;
                     EnvironmentBase.Pause(isPause);
-                    AllPartsOfBody();
+                    AllPartsOfBody(snakeColor, foodColor);
                 }
 
                 if (k.Key == ConsoleKey.Tab)
@@ -162,6 +168,7 @@ namespace SnakeProjectGame
                     TabEnter();
                 }
             }
+            AllPartsOfBody(0, 0);
 
             //Прерывание для клавиши Q
             if (k.Key == ConsoleKey.Q)
@@ -188,7 +195,7 @@ namespace SnakeProjectGame
                         isAlive = true;
 
                         //Тело змеи и еда
-                        AllPartsOfBody();
+                        AllPartsOfBody(snakeColor, foodColor);
                         BeginNewFood();
                         return;
                     }
@@ -198,6 +205,8 @@ namespace SnakeProjectGame
 
         void TabEnter()
         {
+            AllPartsOfBody(0, 0);
+
             k = new ConsoleKeyInfo();
             while (k.Key != ConsoleKey.Tab)
             {
@@ -212,16 +221,17 @@ namespace SnakeProjectGame
             if (!chetsNewLife && isAlive)
             {
                 k = kOld;
-                AllPartsOfBody();
+                //AllPartsOfBody();
                 if (isPause)
                     EnvironmentBase.Pause(true);
             }
             else if (!chetsNewLife && !isAlive)
             {
-                AllPartsOfBody();
+                //AllPartsOfBody();
                 EnvironmentBase.End();
                 k = new ConsoleKeyInfo();
             }
+            AllPartsOfBody(snakeColor, foodColor);
         }
 
         void EndEnter()
@@ -334,7 +344,7 @@ namespace SnakeProjectGame
 
                 return;
             }
-
+            EnvironmentSnake.ColorSnake(snakeColor);
             //Последняя часть тела затирается
             Console.SetCursorPosition(a.X, a.Y);
             Console.Write(a.Body);
@@ -351,6 +361,7 @@ namespace SnakeProjectGame
         //Полный рисунок змеи и еды
         void AllPartsOfBody()
         {
+            //EnvironmentBase.Color(1);
             foreach (BodyParts f in snakeBody)
             {
                 Console.SetCursorPosition(f.X, f.Y);
@@ -359,6 +370,19 @@ namespace SnakeProjectGame
             Console.SetCursorPosition(food.X, food.Y);
             Console.Write(food.apple);
         }
+        void AllPartsOfBody(byte snakeColor, byte foodColor)
+        {
+            EnvironmentSnake.ColorSnake(snakeColor);
+            foreach (BodyParts f in snakeBody)
+            {
+                Console.SetCursorPosition(f.X, f.Y);
+                Console.Write(f.Body);
+            }
+            EnvironmentSnake.ColorSnake(foodColor);
+            Console.SetCursorPosition(food.X, food.Y);
+            Console.Write(food.apple);
+        }
+
         #endregion
 
         #region NewFood
@@ -367,6 +391,8 @@ namespace SnakeProjectGame
         {
             if(snakeBody[snakeBody.Count - 1].X == food.X && snakeBody[snakeBody.Count - 1].Y == food.Y)
             {
+
+                snakeColor = foodColor;
                 //Score
                 Console.SetCursorPosition(7, 30);
                 EnvironmentBase.Color(2);  Console.Write("{0}", ++Food.Score); EnvironmentBase.Color(0);
@@ -376,6 +402,8 @@ namespace SnakeProjectGame
 
                 //Новая еда
                 food.NewFood(snakeBody);
+                foodColor = (byte)rand.Next(1, 11);
+                EnvironmentSnake.ColorSnake(foodColor);
                 Console.SetCursorPosition(food.X, food.Y);
                 Console.Write(food.apple);
 
@@ -427,7 +455,7 @@ namespace SnakeProjectGame
 
         byte Cheats()
         {
-            EnvironmentBase.Cheats(true);
+            EnvironmentSnake.Cheats(true);
 
             sb = new StringBuilder();
             while ((k = Console.ReadKey(true)).Key != ConsoleKey.Q && k.Key != ConsoleKey.Tab && k.Key != ConsoleKey.Enter)
@@ -445,7 +473,7 @@ namespace SnakeProjectGame
 
             if (k.Key == ConsoleKey.Tab)
             {
-                EnvironmentBase.Cheats(false);
+                EnvironmentSnake.Cheats(false);
                 return 0;
             }
 

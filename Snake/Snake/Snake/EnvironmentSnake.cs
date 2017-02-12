@@ -371,7 +371,54 @@ namespace SnakeProjectGame
             Console.SetCursorPosition(10, 27);
             Console.Write(cheat);
         }
+    }
 
+    //Среда змеи
+    class EnvironmentSnake : EnvironmentBase
+    {
+        //Рамка
+        public static void Frame()
+        {
+            Console.SetCursorPosition(0, 0);
+
+            Color(2);
+            for (byte j = 0; j < height + 1; j++)
+            {
+                if (j == 0 || j == height)
+                {
+                    for (byte i = 0; i < width + 1; i++)
+                        Console.Write('#');
+                }
+                else
+                {
+                    Console.Write('#');
+                    Console.Write("{0," + width + "}", '#');
+                }
+            }
+            Color(1);
+            Console.Write("Score:"); Color(2); Console.Write(" {0}", Food.Score); Color(1);
+            Console.Write("        P"); Color(2); Console.Write(" - Pause"); Color(1);
+            Console.Write("        Q"); Color(2); Console.Write(" - Quit"); Color(0);
+        }
+        //Snake Color
+        public static void ColorSnake(byte a)
+        {
+            switch (a)
+            {
+                case 1: Console.ForegroundColor = ConsoleColor.Cyan; break;
+                case 2: Console.ForegroundColor = ConsoleColor.Red; break;
+                case 3: Console.ForegroundColor = ConsoleColor.Green; break;
+                case 4: Console.ForegroundColor = ConsoleColor.Yellow; break;
+                case 5: Console.ForegroundColor = ConsoleColor.DarkCyan; break;
+                case 6: Console.ForegroundColor = ConsoleColor.Magenta; break;
+                case 7: Console.ForegroundColor = ConsoleColor.DarkMagenta; break;
+                case 8: Console.ForegroundColor = ConsoleColor.DarkGreen; break;
+                case 9: Console.ForegroundColor = ConsoleColor.Blue; break;
+                case 10: Console.ForegroundColor = ConsoleColor.DarkYellow; break;
+
+                default: Console.ForegroundColor = ConsoleColor.Gray; break;
+            }
+        }
         //Cheats
         public static void Cheats(bool f)
         {
@@ -435,38 +482,13 @@ namespace SnakeProjectGame
         }
     }
 
-    //Среда змеи
-    class EnvironmentSnake : EnvironmentBase
-    {
-        //Рамка
-        public static void Frame()
-        {
-            Color(2);
-            for (byte j = 0; j < height + 1; j++)
-            {
-                if (j == 0 || j == height)
-                {
-                    for (byte i = 0; i < width + 1; i++)
-                        Console.Write('#');
-                }
-                else
-                {
-                    Console.Write('#');
-                    Console.Write("{0," + width + "}", '#');
-                }
-            }
-            Color(1);
-            Console.Write("Score:"); Color(2); Console.Write(" {0}", Food.Score); Color(1);
-            Console.Write("        P"); Color(2); Console.Write(" - Pause"); Color(1);
-            Console.Write("        Q"); Color(2); Console.Write(" - Quit"); Color(0);
-        }
-    }
-
     class EnvironmentTetris : EnvironmentBase
     {
         //Рамка
         public static void Frame()
         {
+            Console.SetCursorPosition(0, 0);
+
             Color(2);
             for(byte i = 0; i < height + 1; i++)
                 for (byte j = 0; j < width + 1; j++)
@@ -487,6 +509,67 @@ namespace SnakeProjectGame
             Console.Write("     Space"); Color(2); Console.Write(" - Turn"); Color(1);
             Console.Write("     Enter"); Color(2); Console.Write(" - Down"); Color(1);
             Console.Write("     Q"); Color(2); Console.Write(" - Quit"); Color(0);
+        }
+        //Cheats
+        public static void Cheats(bool f)
+        {
+            bool second = false;
+            if (f)
+            {
+                Color(7);
+                Console.CursorVisible = true;
+            }
+            else
+            {
+                second = true;
+                Color(6);
+                Console.CursorVisible = false;
+            }
+            if (!second || !f)
+            {
+                Console.SetCursorPosition(9, 20);
+                Console.Write(" ___________________________________________________________");
+
+                for (int i = 0; i < 5; i++)
+                {
+                    Console.SetCursorPosition(9, 21 + i);
+                    Console.Write("|                                                           |");
+                }
+                Console.SetCursorPosition(9, 26);
+                Console.Write("|-----------------------------------------------------------|");
+
+                Console.SetCursorPosition(9, 27);
+                Console.Write("|                                                           |");
+
+                Console.SetCursorPosition(9, 28);
+                Console.Write("|-----------------------------------------------------------| ");
+            }
+
+            Console.SetCursorPosition(10, 27);
+            Color(8);
+            if (CheatsTetris.cheatList.Count > 0)
+            {
+                Color(6);
+                for (int i = 0; i < CheatsTetris.cheatList.Count - 1; i++)
+                {
+                    Console.SetCursorPosition(10, 26 - (CheatsTetris.cheatList.Count - i - 1));
+                    Console.Write(CheatsTetris.cheatList[i]);
+                }
+                if (f)
+                    Color(2);
+                else
+                    Color(6);
+
+                for (int i = 0; i < CheatsTetris.cheatList.Count; i++)
+                {
+                    Console.SetCursorPosition(10, 26 - (CheatsTetris.cheatList.Count - i));
+                    Console.Write(CheatsTetris.cheatList[i]);
+                }
+                Color(8);
+                Console.SetCursorPosition(10, 27);
+            }
+            if (!f)
+                Color(0);
         }
     }
 

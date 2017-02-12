@@ -12,58 +12,115 @@ namespace SnakeProjectGame
     {
         static int[,] cheatCoord;
         public static int Score { get; private set; }
-        static int Speed { get; set; }
+        static int speed = 180;
 
+        public  static int Speed
+        {
+            get { return speed; }
+            set
+            {
+                if (value >= 40 && value <= 300)
+                    speed = value;
+            }
+        }
+
+        static bool isThreadAlive = true;
+        Dictionary<ConsoleKey, Action> secondFunc;
         Dictionary<ConsoleKey, Move> dict;
         static byte[,,] arrayAllOldBlocks;
         static BlockBody.EnumTetris enumTetris;
 
         static int[] arrBlocksLineClear;
         static int count = 1;
-        static int[,] arrayOldBlock = new int[2, 4];
+        static int[,] arrayOldBlock;
 
         static bool isNew = true;
 
         static List<BlockParts> blockParts;
 
         static ConsoleKeyInfo k;
-        static ConsoleKeyInfo kOld;
 
         static BlockBody blockB;
-        static byte counter = 0;
+        static byte counter;
 
         Thread thread;
         public void MoveMethod()
         {
-            blockB = new BlockBody();
-            EnvironmentTetris.Frame();
-            arrayAllOldBlocks = new byte[2, 30, 28];
-
-            thread = new Thread(ThreadChoice);
-            thread.Start();
-            do
+            while (SecondaryFunction.IsAlive)
             {
-                enumTetris = blockB.NewBody(ref blockParts);
-                EnvironmentBase.Color(BlockBody.BlockColor);
-                count = 1;
-                isNew = false;
-                WriteBlock();
-                Thread.Sleep(Speed);
-                ClearBlock();
+                Reset();
+
+                secondFunc.Add(ConsoleKey.P, SecondaryFunction.PKey);
+                blockB = new BlockBody();
+                EnvironmentTetris.Frame();
+                arrayAllOldBlocks = new byte[2, 30, 28];
+
+                thread = new Thread(ThreadChoice);
+                thread.Start();
                 do
                 {
-                    DefinDict(ref k);
-                } while (!isNew);
-                //thread.Join();
-            } while (blockParts[0].Y > 2);
+                    enumTetris = blockB.NewBody(ref blockParts);
+                    EnvironmentBase.Color(BlockBody.BlockColor);
+                    count = 1;
+                    isNew = false;
+                    Cheat();
+                    WriteBlock();
+                    Thread.Sleep(Speed);
+                    ClearBlock();
+                    do
+                    {
+                        DefinDict(ref k);
+                        if (!SecondaryFunction.IsAlive)
+                            return;
+                    } while (!isNew);
+                    //thread.Join();
+                } while (blockParts[0].Y > 2);
+
+                isThreadAlive = false;
+                WriteAllUpBlocks(0);
+                WriteBlock(0);
+
+                //SecondaryFunction.QKey();
+                if (k.Key == ConsoleKey.Q)
+                    return;
+
+                secondFunc.Remove(ConsoleKey.P);
+
+                EnvironmentBase.End();
+                while (k.Key != ConsoleKey.Enter)
+                {
+                    if(!thread.IsAlive)
+                        k = Console.ReadKey(true);
+                    if (k.Key == ConsoleKey.Q)
+                        return;
+                }
+            }
+        }
+
+        void Reset()
+        {
+            if ((int)EnvironmentBase.enModeBeg == 0)
+                Speed = 300;
+            else if ((int)EnvironmentBase.enModeBeg == 1)
+                Speed = 180;
+            else if ((int)EnvironmentBase.enModeBeg == 2)
+                Speed = 50;
+
+            isThreadAlive = true;
+            k = new ConsoleKeyInfo();
+            //SecondaryFunction.Begin();
+            cheatCoord = new int[2, 4];
+
+            arrBlocksLineClear = new int[28];
+            Score = 0;
+            counter = 0;
+            arrayOldBlock = new int[2, 4];
         }
 
         public Tetris()
         {
-            Speed = 200;
-            cheatCoord = new int[2, 4];
+            SecondaryFunction.Begin();
 
-            arrBlocksLineClear = new int[28];
             dict = new Dictionary<ConsoleKey, Move>
             {
                 { ConsoleKey.LeftArrow, MoveLeft },
@@ -71,6 +128,12 @@ namespace SnakeProjectGame
                 { 0, MoveDown },
                 { ConsoleKey.Enter, EnterDown },
                 { ConsoleKey.Spacebar, SpaceMove }
+            };
+
+            secondFunc = new Dictionary<ConsoleKey, Action>
+            {
+                { ConsoleKey.Q, SecondaryFunction.QKey },
+                { ConsoleKey.Tab, SecondaryFunction.TabKey }
             };
         }
 
@@ -126,7 +189,7 @@ namespace SnakeProjectGame
                     ClearLine(a.Y); Thread.Sleep(100);
                     ClearAllUpBlocks(a.Y - 1);
                     LineShiftDown(a.Y - 1);
-                    WriteAllUpBlocks(a.Y - 1); Thread.Sleep(100);
+                    WriteAllUpBlocks(); Thread.Sleep(100);
                 }
             }
             ChangeScore(1, 2);
@@ -145,6 +208,7 @@ namespace SnakeProjectGame
                 }
 
                 Cheat();
+                EnvironmentBase.Color(BlockBody.BlockColor);
 
                 foreach (BlockParts a in blockParts)
                 {
@@ -155,7 +219,7 @@ namespace SnakeProjectGame
                 Thread.Sleep(Speed);
 
                 ClearBlock();
-            } while (k.Key != ConsoleKey.LeftArrow && k.Key != ConsoleKey.RightArrow && k.Key != ConsoleKey.Enter && k.Key != ConsoleKey.Spacebar);
+            } while (k.Key != ConsoleKey.Tab && k.Key != ConsoleKey.P && k.Key != ConsoleKey.Q && k.Key != ConsoleKey.LeftArrow && k.Key != ConsoleKey.RightArrow && k.Key != ConsoleKey.Enter && k.Key != ConsoleKey.Spacebar);
         }
 
         //LeftArrow
@@ -177,6 +241,7 @@ namespace SnakeProjectGame
             }
 
             Cheat();
+            EnvironmentBase.Color(BlockBody.BlockColor);
 
             foreach (BlockParts a in blockParts)
             {
@@ -184,9 +249,9 @@ namespace SnakeProjectGame
                 Console.WriteLine(a.Body);
             }
 
-            if (counter == 1)
-                Thread.Sleep(Speed);
-            else
+            //if (counter == 1)
+            //    Thread.Sleep(100);
+            //else
                 Thread.Sleep(40);
 
             ClearBlock();
@@ -212,6 +277,7 @@ namespace SnakeProjectGame
             }
 
             Cheat();
+            EnvironmentBase.Color(BlockBody.BlockColor);
 
             foreach (BlockParts a in blockParts)
             {
@@ -220,7 +286,7 @@ namespace SnakeProjectGame
             }
 
             if (counter == 1)
-                Thread.Sleep(Speed);
+                Thread.Sleep(100);
             else
                 Thread.Sleep(40);
 
@@ -325,7 +391,7 @@ namespace SnakeProjectGame
         /// <summary>
         /// Cheat
         /// </summary>
-        static void Cheat()
+        static void ClearCheat()
         {
             if (cheatCoord[0, 0] != 0)
             {
@@ -335,39 +401,46 @@ namespace SnakeProjectGame
                     Console.Write(' ');
                 }
             }
-            int count = -1;
-            bool wh = true;
-            while (wh)
+        }
+        static void Cheat()
+        {
+            if (CheatsTetris.IsCheating)
             {
-                count++;
-
-                foreach (BlockParts bl in blockParts)
+                ClearCheat();
+                int count = -1;
+                bool wh = true;
+                while (wh)
                 {
-                    if(bl.Y == 28 || (bl.Y + count) == 28)
+                    count++;
+
+                    foreach (BlockParts bl in blockParts)
                     {
-                        wh = false;
-                        break;
-                    }
-                    else if (arrayAllOldBlocks[0, bl.X - 25, bl.Y + count] != 0)
-                    {
-                        wh = false;
-                        break;
+                        if (bl.Y == 28 || (bl.Y + count) == 28)
+                        {
+                            wh = false;
+                            break;
+                        }
+                        else if (arrayAllOldBlocks[0, bl.X - 25, bl.Y + count] != 0)
+                        {
+                            wh = false;
+                            break;
+                        }
                     }
                 }
-            }
 
-            if (blockParts[1].Y < 28)
-            {
-                EnvironmentBase.Color(3);
-                int ind = 0;
-                foreach (BlockParts bl in blockParts)
+                if (blockParts[1].Y < 28)
                 {
-                    cheatCoord[0, ind] = bl.X;
-                    cheatCoord[1, ind++] = bl.Y + count;
-                    Console.SetCursorPosition(bl.X, bl.Y + count);
-                    Console.Write('H');
+                    EnvironmentBase.Color(3);
+                    int ind = 0;
+                    foreach (BlockParts bl in blockParts)
+                    {
+                        cheatCoord[0, ind] = bl.X;
+                        cheatCoord[1, ind++] = bl.Y + count;
+                        Console.SetCursorPosition(bl.X, bl.Y + count);
+                        Console.Write('H');
+                    }
+                    EnvironmentBase.Color(BlockBody.BlockColor);
                 }
-                EnvironmentBase.Color(BlockBody.BlockColor);
             }
         }
 
@@ -409,13 +482,24 @@ namespace SnakeProjectGame
         }
 
         //Write All Blocks
-        static void WriteAllUpBlocks(int yCoord)
+        static void WriteAllUpBlocks()
         {
             for(int i = 0; i < 30; i++)
                 for (int j = 27; j > 0; j--)
                     if (arrayAllOldBlocks[0, i, j] != 0)
                     {
                         EnvironmentBase.Color(arrayAllOldBlocks[1, i, j]);
+                        Console.SetCursorPosition(i + 25, j + 1);
+                        Console.Write('#');
+                    }
+        }
+        static void WriteAllUpBlocks(byte colorNumber)
+        {
+            for (int i = 0; i < 30; i++)
+                for (int j = 27; j > 0; j--)
+                    if (arrayAllOldBlocks[0, i, j] != 0)
+                    {
+                        EnvironmentBase.Color(colorNumber);
                         Console.SetCursorPosition(i + 25, j + 1);
                         Console.Write('#');
                     }
@@ -442,6 +526,16 @@ namespace SnakeProjectGame
                 Console.Write(a.Body);
             }
         }
+        static void WriteBlock(byte colorNumber)
+        {
+            foreach (BlockParts a in blockParts)
+            {
+                EnvironmentBase.Color(colorNumber);
+                Console.SetCursorPosition(a.X, a.Y);
+                Console.Write(a.Body);
+            }
+        }
+
         //Clear Block
         static void ClearBlock()
         {
@@ -459,7 +553,7 @@ namespace SnakeProjectGame
             do
             {
                 k = Console.ReadKey(true);
-            } while (k.Key != ConsoleKey.Tab  && k.Key != ConsoleKey.Q && k.Key != ConsoleKey.P);
+            } while (isThreadAlive && SecondaryFunction.IsAlive && k.Key != ConsoleKey.Tab  && k.Key != ConsoleKey.Q && k.Key != ConsoleKey.P);
         }
         #endregion
 
@@ -487,6 +581,22 @@ namespace SnakeProjectGame
         {
             if (dict.ContainsKey(k.Key))
                 dict[k.Key](ref k);
+
+            else if (secondFunc.ContainsKey(k.Key))
+            {
+                WriteAllUpBlocks(0);
+                ClearCheat();
+                WriteBlock(0);
+                secondFunc[k.Key]();
+                k = new ConsoleKeyInfo();
+                if (!thread.IsAlive && SecondaryFunction.IsAlive)
+                {
+                    thread = new Thread(ThreadChoice);
+                    thread.Start();
+                }
+                ClearBlock();
+                WriteAllUpBlocks();
+            }
         }
     }
 }

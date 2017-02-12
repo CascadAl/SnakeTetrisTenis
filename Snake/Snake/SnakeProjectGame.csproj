@@ -45,10 +45,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Snake\BodyParts.cs" />
+    <Compile Include="Snake\Cheats.cs" />
     <Compile Include="Snake\EnvironmentSnake.cs" />
     <Compile Include="Snake\Food.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Snake\SecondaryFunction.cs" />
     <Compile Include="Snake\Snake.cs" />
     <Compile Include="Tetris\BlockBody.cs" />
     <Compile Include="Tetris\BlockParts.cs" />
